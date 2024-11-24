@@ -1,0 +1,138 @@
+body {
+    background: linear-gradient(135deg, #ffffff, #e63946);
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.header {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header img {
+    width: 120px;
+    max-width: 100%;
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    .header img {
+        width: 70px;
+    }
+}
+
+@media (max-width: 380px) {
+    .header img {
+        display: none;
+    }
+}
+
+
+.form-container {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid #e63946;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    width: 100%;
+    max-width: 500px;
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-label {
+    color: #e63946;
+    font-weight: bold;
+}
+
+.form-control {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #e63946;
+    color: #333333;
+}
+
+.form-control:focus {
+    background: rgba(255, 255, 255, 1);
+    border-color: #d62828;
+    box-shadow: 0 0 5px #d62828;
+}
+
+.btn-primary {
+    background: #e63946;
+    border: none;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-primary:hover {
+    background: #d62828;
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(230, 57, 70, 0.5);
+}
+
+.btn-outline-light {
+    color: #e63946;
+    border: 1px solid #e63946;
+}
+
+.btn-outline-light:hover {
+    background: #e63946;
+    color: #ffffff;
+}
+
+.alert {
+    background: #e63946;
+    border: 1px solid #ffffff;
+    color: #ffffff;
+}
+
+.title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #e63946, #ffffff, #e30210);
+    background-size: 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientAnimation 10s ease-in-out infinite;
+}
+
+
+@keyframes gradientAnimation {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+
+.subtitle {
+    text-align: center;
+    font-size: 1rem;
+    color: #555555;
+    margin-bottom: 30px;
+}
