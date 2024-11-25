@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -35,9 +36,7 @@ func main() {
 	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads"))))
 
 	http.HandleFunc("/", serveIndex)
-
 	http.HandleFunc("/upload", handleUpload)
-
 	http.HandleFunc("/download", handleDownload)
 
 	fmt.Println("Server berjalan di http://localhost:8080")
@@ -115,7 +114,6 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleDownload(w http.ResponseWriter, r *http.Request) {
-
 	outputFile := filepath.Join("uploads", "results.csv")
 
 	if _, err := os.Stat(outputFile); os.IsNotExist(err) {
@@ -143,13 +141,17 @@ func saveFile(file io.Reader, path string) {
 }
 
 func processFiles(data1Path, data2Path string, maxRadius float64) ([]Result, error) {
-	data1, err := loadCSV(data1Path)
+	fmt.Println("Memproses file:", data1Path, data2Path)
+
+	data1, err := loadCSVWithAutoSeparator(data1Path)
 	if err != nil {
+		fmt.Println("Error memuat data1:", err)
 		return nil, err
 	}
 
-	data2, err := loadCSV(data2Path)
+	data2, err := loadCSVWithAutoSeparator(data2Path)
 	if err != nil {
+		fmt.Println("Error memuat data2:", err)
 		return nil, err
 	}
 
@@ -173,26 +175,60 @@ func processFiles(data1Path, data2Path string, maxRadius float64) ([]Result, err
 	return results, nil
 }
 
-func loadCSV(filePath string) ([]Point, error) {
+func loadCSVWithAutoSeparator(filePath string) ([]Point, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
+	buf := make([]byte, 1024)
+	n, err := file.Read(buf)
+	if err != nil && err != io.EOF {
+		return nil, err
+	}
+	content := string(buf[:n])
+
+	var separator rune
+	if strings.Contains(content, ";") {
+		separator = ';'
+	} else {
+		separator = ','
+	}
+	fmt.Println("Separator yang digunakan:", string(separator))
+
+	_, err = file.Seek(0, io.SeekStart)
+	if err != nil {
+		return nil, err
+	}
+
 	reader := csv.NewReader(file)
+	reader.Comma = separator
 	rows, err := reader.ReadAll()
 	if err != nil {
 		return nil, err
 	}
 
-	points := make([]Point, len(rows)-1)
+	var points []Point
 	for i, row := range rows[1:] {
-		lat, _ := strconv.ParseFloat(row[1], 64)
-		lon, _ := strconv.ParseFloat(row[2], 64)
-		points[i] = Point{Name: row[0], Latitude: lat, Longitude: lon}
+		if len(row) < 3 {
+			fmt.Printf("Baris %d tidak valid: %v\n", i+2, row)
+			continue
+		}
+		lat, err := strconv.ParseFloat(row[1], 64)
+		if err != nil {
+			fmt.Printf("Latitude tidak valid di baris %d: %v (data: %s)\n", i+2, err, row[1])
+			continue
+		}
+		lon, err := strconv.ParseFloat(row[2], 64)
+		if err != nil {
+			fmt.Printf("Longitude tidak valid di baris %d: %v (data: %s)\n", i+2, err, row[2])
+			continue
+		}
+		points = append(points, Point{Name: row[0], Latitude: lat, Longitude: lon})
 	}
 
+	fmt.Printf("Berhasil memuat %d data valid dari CSV\n", len(points))
 	return points, nil
 }
 
