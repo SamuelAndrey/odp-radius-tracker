@@ -8,6 +8,43 @@
     <link href="/static/bootstrap.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 10px solid #f3f3f3;
+            border-top: 10px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -23,7 +60,7 @@
     <h1 class="title">ODP Radius Tracker</h1>
     <p class="subtitle">Powered by PT. Telkom Infrastuktur Indonesia</p>
 
-    <form action="/upload" method="post" enctype="multipart/form-data">
+    <form id="processForm" action="/upload" method="post" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="data1" class="form-label">Data 1 (CSV)</label>
             <input type="file" id="data1" name="data1" class="form-control" required>
@@ -37,7 +74,6 @@
             <input type="number" id="radius" name="radius" class="form-control" required>
         </div>
         <button type="submit" class="btn btn-primary w-100 mb-3">Process</button>
-        <!-- Tombol untuk petunjuk format CSV -->
         <button type="button" class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#csvHelpModal">
             Petunjuk Format CSV
         </button>
@@ -50,6 +86,23 @@
     {{end}}
 </div>
 
+<div class="loading-overlay align-items-center" id="loadingOverlay">
+    <div class="container text-center">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-12">
+                <div class="loading-spinner mx-auto"></div>
+            </div>
+            <div class="col-12">
+                <div class="loading-text">Memproses data...<br>Mohon jangan menutup halaman ini.</div>
+            </div>
+            <div class="col-12 mt-4">
+                <a href="/">
+                    <button class="btn btn-danger">Batalkan</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade" id="csvHelpModal" tabindex="-1" aria-labelledby="csvHelpModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -76,6 +129,19 @@
 </div>
 
 <script src="/static/bootstrap.bundle.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('processForm');
+        const overlay = document.getElementById('loadingOverlay');
+
+        form.addEventListener('submit', function (e) {
+            console.log("Form submitted, showing loading overlay...");
+            if (overlay) {
+                overlay.style.display = 'flex';
+            }
+        });
+    });
+</script>
 
 </body>
 
