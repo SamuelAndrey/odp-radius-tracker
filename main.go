@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"time"
 )
 
 type Point struct {
@@ -114,12 +115,20 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleDownload(w http.ResponseWriter, r *http.Request) {
+
 	outputFile := filepath.Join("uploads", "results.csv")
+
 	if _, err := os.Stat(outputFile); os.IsNotExist(err) {
 		http.Error(w, "File tidak ditemukan", http.StatusNotFound)
 		return
 	}
-	w.Header().Set("Content-Disposition", "attachment; filename=results.csv")
+
+	timestamp := time.Now().Format("2006-01-02_15-04-05")
+	fileName := fmt.Sprintf("Result_%s.csv", timestamp)
+
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileName))
+	w.Header().Set("Content-Type", "application/octet-stream")
+
 	http.ServeFile(w, r, outputFile)
 }
 
