@@ -1,3 +1,4 @@
-uploads
 .idea
 start.bat
+uploads/*
+!uploads/.gitkeep
